@@ -1,4 +1,4 @@
 package br.com.jpozorio.importer
 
-interface IImportedRecord {
+interface ImportedRecord {
 }

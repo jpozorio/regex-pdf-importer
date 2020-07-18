@@ -1,12 +1,12 @@
 package br.com.jpozorio.importer.regex
 
-import br.com.jpozorio.importer.IImportedRecord
+import br.com.jpozorio.importer.ImportedRecord
 import groovy.transform.CompileStatic
 
 import java.util.regex.Pattern
 
 @CompileStatic
-class RegexRecordToMatch<T extends IImportedRecord> {
+class RegexRecordToMatch<T extends ImportedRecord> {
 
 	final Class<T> clazzRegistroImportado
 	final String name

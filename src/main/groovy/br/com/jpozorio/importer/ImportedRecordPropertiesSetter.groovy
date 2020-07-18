@@ -18,7 +18,7 @@ class ImportedRecordPropertiesSetter {
 	void setAllProperties(
 			final Object importedRecord,
 			final Matcher matcher,
-			final Map<RegexRecordToMatch, List<Object>> importedRecordsByName
+			final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName
 	) {
 		this.setPropertiesBasedOnFieldNames(importedRecord, matcher)
 		this.copyParentFieldsToImportedRecord(importedRecord, importedRecordsByName)
@@ -40,11 +40,11 @@ class ImportedRecordPropertiesSetter {
 
 	private void copyParentFieldsToImportedRecord(
 			final Object importedRecord,
-			final Map<RegexRecordToMatch, List<Object>> importedRecordsByName
+			final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName
 	) {
 		final RegexRecordToMatch parent = regexRecordToMatch.parent
 		if (parent) {
-			List<Object> importedRecordsOfParent = importedRecordsByName[parent]
+			List<Object> importedRecordsOfParent = importedRecordsByName[parent].importedRecordsList
 			if (importedRecordsOfParent) {
 				Object lastParent = importedRecordsOfParent.last()
 				parent.fieldNames.each { final String field ->

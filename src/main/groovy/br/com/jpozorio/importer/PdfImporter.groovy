@@ -16,27 +16,41 @@ class PdfImporter<T> {
 
 	List<T> readFile(final List<RegexRecordToMatch> regexRecordToMatchList) {
 		final PdfToText pdfToText = new PdfToText(this.file)
-		final Map<RegexRecordToMatch, List<T>> importedRecordsByName = getListOfRecortsToImportation(regexRecordToMatchList)
+		final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName = getListOfRecortsToImportation(regexRecordToMatchList)
 
 		//todo find a intelligent way to do this replaces
 		final String stringFromPdf = pdfToText.stringFromFile.replace(' ', ' ').replace('­', '-')
+		int lineIndex = 0
 		stringFromPdf.eachLine { final String line ->
+			lineIndex++
+
 			final String trimmedLine = line.trim()
 			regexRecordToMatchList.each { final RegexRecordToMatch regexRecordToMatch ->
-				final List<T> importedRecordsOfCurrent = importedRecordsByName[regexRecordToMatch]
+				final ImportedRecordsList recordsList = importedRecordsByName[regexRecordToMatch]
+				final List<T> importedRecordsOfCurrent = recordsList.importedRecordsList
 				final ImportedRecordPropertiesSetter propertiesSetter = new ImportedRecordPropertiesSetter(regexRecordToMatch)
 
 				final Matcher matcher = regexRecordToMatch.pattern.matcher(trimmedLine)
-				if (matcher.matches()) {
+				boolean matchHeader = regexRecordToMatch.patternHeader == null || (regexRecordToMatch.patternHeader != null && recordsList.matchedHeaderLineMatched == lineIndex - 1)
+
+				if (matcher.matches() && matchHeader) {
 					validateMatchGroupCountAndFieldNameSize(regexRecordToMatch, matcher)
 
 					final T importedRecordInstance = getClazzInstance(regexRecordToMatch)
 					importedRecordsOfCurrent.add(importedRecordInstance)
 
-					//todo try to remove that cast
-					propertiesSetter.setAllProperties(importedRecordInstance, matcher, importedRecordsByName as Map<RegexRecordToMatch, List<Object>>)
+					propertiesSetter.setAllProperties(importedRecordInstance, matcher, importedRecordsByName)
 					if (regexRecordToMatch.calculatedFields) {
 						regexRecordToMatch.calculatedFields.call(importedRecordInstance)
+					}
+				}
+
+				if (regexRecordToMatch.patternHeader != null) {
+					final Matcher matcherHeader = regexRecordToMatch.patternHeader.matcher(trimmedLine)
+					if (matcherHeader.matches()) {
+						recordsList.matchedHeaderLineMatched = lineIndex
+					} else {
+						recordsList.matchedHeaderLineMatched = -1
 					}
 				}
 			}
@@ -46,11 +60,11 @@ class PdfImporter<T> {
 		return importedRecordsList
 	}
 
-	private Map<RegexRecordToMatch, List<T>> getListOfRecortsToImportation(List<RegexRecordToMatch> regexRecordToMatchList) {
-		final Map<RegexRecordToMatch, List<T>> importedRecordsByName = [:]
+	private Map<RegexRecordToMatch, ImportedRecordsList> getListOfRecortsToImportation(List<RegexRecordToMatch> regexRecordToMatchList) {
+		final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName = [:]
 
 		regexRecordToMatchList.each { RegexRecordToMatch entry ->
-			importedRecordsByName[entry] = []
+			importedRecordsByName[entry] = new ImportedRecordsList([])
 		}
 
 		return importedRecordsByName
@@ -62,11 +76,11 @@ class PdfImporter<T> {
 		return registroImportado
 	}
 
-	private List<T> createImportedRecordsList(final Map<RegexRecordToMatch, List<T>> importedRecordsByName) {
+	private List<T> createImportedRecordsList(final Map<RegexRecordToMatch, ImportedRecordsList<T>> importedRecordsByName) {
 		final List<T> importedRecordsList = []
-		importedRecordsByName.each { RegexRecordToMatch entry, List<T> registrosImportados ->
+		importedRecordsByName.each { RegexRecordToMatch entry, ImportedRecordsList<T> recordsList ->
 			if (entry.returnImportedRecord) {
-				importedRecordsList.addAll(registrosImportados)
+				importedRecordsList.addAll(recordsList.importedRecordsList)
 			}
 		}
 		return importedRecordsList
