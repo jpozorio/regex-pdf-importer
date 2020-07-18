@@ -1,4 +1,4 @@
-package br.com.jpozorio.importer
+package br.com.jpozorio.importer.converter
 
 import groovy.transform.CompileStatic
 

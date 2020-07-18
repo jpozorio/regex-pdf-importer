@@ -1,6 +1,5 @@
 package br.com.jpozorio.importer
 
-
 import br.com.jpozorio.importer.regex.RegexRecordToMatch
 import groovy.transform.CompileStatic
 
@@ -19,6 +18,7 @@ class PdfImporter<T> {
 		final PdfToText pdfToText = new PdfToText(this.file)
 		final Map<RegexRecordToMatch, List<T>> importedRecordsByName = getListOfRecortsToImportation(regexRecordToMatchList)
 
+		//todo find a intelligent way to do this replaces
 		final String stringFromPdf = pdfToText.stringFromFile.replace(' ', ' ').replace('­', '-')
 		stringFromPdf.eachLine { final String line ->
 			final String trimmedLine = line.trim()

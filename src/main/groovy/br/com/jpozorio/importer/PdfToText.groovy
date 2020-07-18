@@ -1,6 +1,6 @@
-package br.com.jpozorio.importador
+package br.com.jpozorio.importer
 
-import br.com.jpozorio.importador.nota.corretagem.HorizontalExtractionStrategy
+import br.com.jpozorio.importer.strategy.HorizontalExtractionStrategy
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.parser.*
 import groovy.transform.CompileStatic

@@ -1,6 +1,7 @@
-package br.com.jpozorio.importador
+package br.com.jpozorio.importer
 
-import br.com.jpozorio.importador.regex.RegexRecordToMatch
+import br.com.jpozorio.importer.converter.ImportedRecordTypeConverter
+import br.com.jpozorio.importer.regex.RegexRecordToMatch
 import groovy.transform.CompileStatic
 
 import java.util.regex.Matcher
