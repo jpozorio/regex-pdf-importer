@@ -9,13 +9,15 @@ import groovy.transform.CompileStatic
 class PdfToText {
 
 	final File file
+	final String password
 
-	PdfToText(File file) {
+	PdfToText(File file, String password) {
 		this.file = file
+		this.password = password
 	}
 
 	String getStringFromFile() {
-		final PdfReader reader = new PdfReader(new FileInputStream(file))
+		final PdfReader reader = new PdfReader(new FileInputStream(file), password.bytes)
 		final PdfReaderContentParser parser = new PdfReaderContentParser(reader)
 		final StringBuilder st = new StringBuilder()
 

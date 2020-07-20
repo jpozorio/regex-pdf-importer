@@ -19,11 +19,20 @@ repositories {
 dependencies {
 // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all
 	compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.3'
-// https://mvnrepository.com/artifact/com.itextpdf/itextpdf
-	compile group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.1'
+
 	testCompile group: 'junit', name: 'junit', version: '4.13'
 	// https://mvnrepository.com/artifact/org.spockframework/spock-core
 	testCompile group: 'org.spockframework', name: 'spock-core', version: '2.0-M2-groovy-3.0'
+
+	// https://mvnrepository.com/artifact/com.itextpdf/itextpdf
+	compile group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13.1'
+
+	//pdf encriptado
+	// https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.66'
+	//pdf encriptado
+	// https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on
+	compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.66'
 }
 
 test {

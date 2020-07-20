@@ -9,13 +9,15 @@ import java.util.regex.Matcher
 class PdfImporter<T> {
 
 	final File file
+	final String password
 
-	PdfImporter(File file) {
+	PdfImporter(File file, String password = '') {
 		this.file = file
+		this.password = password
 	}
 
 	List<T> readFile(final List<RegexRecordToMatch> regexRecordToMatchList) {
-		final PdfToText pdfToText = new PdfToText(this.file)
+		final PdfToText pdfToText = new PdfToText(this.file, this.password)
 		final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName = getListOfRecortsToImportation(regexRecordToMatchList)
 
 		//todo find a intelligent way to do this replaces
