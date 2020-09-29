@@ -10,7 +10,7 @@ class RegexRecordToMatch<T extends ImportedRecord> {
 
 	final Class<T> clazzRegistroImportado
 	final String name
-	final RegexRecordToMatch parent
+	final List<RegexRecordToMatch> parents
 	final String regexHeader
 	@SuppressWarnings('GrFinalVariableAccess')
 	final Pattern patternHeader
@@ -25,7 +25,7 @@ class RegexRecordToMatch<T extends ImportedRecord> {
 			final String regex,
 			final List<String> fieldNames,
 			final Class<T> clazzRegistroImportado,
-			final RegexRecordToMatch parent,
+			final List<RegexRecordToMatch> parent,
 			final Boolean returnImportedRecord = true,
 			final String regexHeader = null,
 			final Closure calculatedFields = null
@@ -36,7 +36,7 @@ class RegexRecordToMatch<T extends ImportedRecord> {
 		this.regexHeader = regexHeader
 		this.clazzRegistroImportado = clazzRegistroImportado
 		this.pattern = Pattern.compile(regex)
-		this.parent = parent
+		this.parents = parent
 		this.calculatedFields = calculatedFields
 		this.returnImportedRecord = returnImportedRecord
 		if (regexHeader) {

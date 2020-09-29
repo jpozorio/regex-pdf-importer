@@ -42,15 +42,21 @@ class ImportedRecordPropertiesSetter {
 			final Object importedRecord,
 			final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName
 	) {
-		final RegexRecordToMatch parent = regexRecordToMatch.parent
-		if (parent) {
-			List<Object> importedRecordsOfParent = importedRecordsByName[parent].importedRecordsList
-			if (importedRecordsOfParent) {
-				Object lastParent = importedRecordsOfParent.last()
-				parent.fieldNames.each { final String field ->
-					if (importedRecord.hasProperty(field)) {
-						final String methodName = "set${field.capitalize()}".toString()
-						importedRecord.invokeMethod(methodName, lastParent[field])
+		final List<RegexRecordToMatch> parents = regexRecordToMatch.parents
+		if (!parents) {
+			return
+		}
+
+		for (RegexRecordToMatch parent in parents) {
+			if (parent) {
+				List<Object> importedRecordsOfParent = importedRecordsByName[parent].importedRecordsList
+				if (importedRecordsOfParent) {
+					Object lastParent = importedRecordsOfParent.last()
+					parent.fieldNames.each { final String field ->
+						if (importedRecord.hasProperty(field)) {
+							final String methodName = "set${field.capitalize()}".toString()
+							importedRecord.invokeMethod(methodName, lastParent[field])
+						}
 					}
 				}
 			}
