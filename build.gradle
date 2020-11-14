@@ -6,8 +6,6 @@ plugins {
 	id 'maven-publish'
 }
 
-group 'br.com.jpozorio'
-version '0.2.0'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -65,3 +63,5 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 artifacts {
 	archives sourcesJar
 }
+
+afterReleaseBuild.dependsOn(publish)
