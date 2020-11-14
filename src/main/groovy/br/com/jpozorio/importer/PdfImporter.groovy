@@ -4,6 +4,7 @@ import br.com.jpozorio.importer.regex.RegexRecordToMatch
 import groovy.transform.CompileStatic
 
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @CompileStatic
 class PdfImporter<T> {
@@ -13,7 +14,7 @@ class PdfImporter<T> {
 
 	PdfImporter(File file, String password = '') {
 		this.file = file
-		this.password = password
+		this.password = password ?: ''
 	}
 
 	List<T> readFile(final List<RegexRecordToMatch> regexRecordToMatchList) {
@@ -27,32 +28,41 @@ class PdfImporter<T> {
 			lineIndex++
 
 			final String trimmedLine = line.trim()
-			regexRecordToMatchList.each { final RegexRecordToMatch regexRecordToMatch ->
+			for (final RegexRecordToMatch regexRecordToMatch in regexRecordToMatchList) {
 				final ImportedRecordsList recordsList = importedRecordsByName[regexRecordToMatch]
 				final List<T> importedRecordsOfCurrent = recordsList.importedRecordsList
 				final ImportedRecordPropertiesSetter propertiesSetter = new ImportedRecordPropertiesSetter(regexRecordToMatch)
 
-				final Matcher matcher = regexRecordToMatch.pattern.matcher(trimmedLine)
+				final List<Pattern> patterns = regexRecordToMatch.patterns
 				boolean matchHeader = regexRecordToMatch.patternHeader == null || (regexRecordToMatch.patternHeader != null && recordsList.matchedHeaderLineMatched == lineIndex - 1)
 
-				if (matcher.matches() && matchHeader) {
-					validateMatchGroupCountAndFieldNameSize(regexRecordToMatch, matcher)
+				for (Pattern pattern in patterns) {
+					final Matcher matcher = pattern.matcher(trimmedLine)
+					final boolean matches = matcher.matches()
+					if (matches && matchHeader) {
+						validateMatchGroupCountAndFieldNameSize(regexRecordToMatch, matcher)
 
-					final T importedRecordInstance = getClazzInstance(regexRecordToMatch)
-					importedRecordsOfCurrent.add(importedRecordInstance)
+						final T importedRecordInstance = getClazzInstance(regexRecordToMatch)
+						importedRecordsOfCurrent.add(importedRecordInstance)
 
-					propertiesSetter.setAllProperties(importedRecordInstance, matcher, importedRecordsByName)
-					if (regexRecordToMatch.calculatedFields) {
-						regexRecordToMatch.calculatedFields.call(importedRecordInstance)
+						propertiesSetter.setAllProperties(importedRecordInstance, matcher, importedRecordsByName)
+						if (regexRecordToMatch.calculatedFields) {
+							regexRecordToMatch.calculatedFields.call(importedRecordInstance)
+						}
 					}
-				}
 
-				if (regexRecordToMatch.patternHeader != null) {
-					final Matcher matcherHeader = regexRecordToMatch.patternHeader.matcher(trimmedLine)
-					if (matcherHeader.matches()) {
-						recordsList.matchedHeaderLineMatched = lineIndex
-					} else {
-						recordsList.matchedHeaderLineMatched = -1
+					if (regexRecordToMatch.patternHeader != null) {
+						final Matcher matcherHeader = regexRecordToMatch.patternHeader.matcher(trimmedLine)
+						if (matcherHeader.matches()) {
+							recordsList.matchedHeaderLineMatched = lineIndex
+						} else {
+							recordsList.matchedHeaderLineMatched = -1
+						}
+					}
+
+					//shoud break loop when first pattern matches
+					if (matches) {
+						break
 					}
 				}
 			}
