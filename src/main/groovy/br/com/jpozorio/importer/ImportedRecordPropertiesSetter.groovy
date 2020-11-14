@@ -43,13 +43,26 @@ class ImportedRecordPropertiesSetter {
 			final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName
 	) {
 		final List<RegexRecordToMatch> parents = regexRecordToMatch.parents
+
+		passThroughGlobalVariable(parents, importedRecordsByName, importedRecord)
+	}
+
+	private void passThroughGlobalVariable(
+			final List<RegexRecordToMatch> parents,
+			final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName,
+			final Object importedRecord
+	) {
 		if (!parents) {
 			return
 		}
 
 		for (RegexRecordToMatch parent in parents) {
 			if (parent) {
-				List<Object> importedRecordsOfParent = importedRecordsByName[parent].importedRecordsList
+				final ImportedRecordsList parentImportedRecord = importedRecordsByName[parent]
+				if (!parentImportedRecord) {
+					throw new IllegalStateException('Trying to get fields from parent record that does not exists')
+				}
+				final List<Object> importedRecordsOfParent = parentImportedRecord.importedRecordsList
 				if (importedRecordsOfParent) {
 					Object lastParent = importedRecordsOfParent.last()
 					parent.fieldNames.each { final String field ->
@@ -60,6 +73,8 @@ class ImportedRecordPropertiesSetter {
 					}
 				}
 			}
+
+			passThroughGlobalVariable(parent.parents, importedRecordsByName, importedRecord)
 		}
 	}
 }

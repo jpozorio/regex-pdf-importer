@@ -72,14 +72,27 @@ class PdfImporter<T> {
 		return importedRecordsList
 	}
 
-	private Map<RegexRecordToMatch, ImportedRecordsList> getListOfRecortsToImportation(List<RegexRecordToMatch> regexRecordToMatchList) {
+	private Map<RegexRecordToMatch, ImportedRecordsList> getListOfRecortsToImportation(final List<RegexRecordToMatch> regexRecordToMatchList) {
+		final Set<RegexRecordToMatch> regexRecordToMatchSet = regexRecordToMatchList.toSet()
+
+		addAllParents(regexRecordToMatchList, regexRecordToMatchSet)
+
 		final Map<RegexRecordToMatch, ImportedRecordsList> importedRecordsByName = [:]
 
-		regexRecordToMatchList.each { RegexRecordToMatch entry ->
+		regexRecordToMatchSet.each { RegexRecordToMatch entry ->
 			importedRecordsByName[entry] = new ImportedRecordsList([])
 		}
 
 		return importedRecordsByName
+	}
+
+	private List<RegexRecordToMatch> addAllParents(final List<RegexRecordToMatch> regexRecordToMatchList, final Set<RegexRecordToMatch> regexRecordToMatchSet) {
+		return regexRecordToMatchList.each { final RegexRecordToMatch rrtm ->
+			if (rrtm.parents) {
+				regexRecordToMatchSet.addAll(rrtm.parents)
+				addAllParents(rrtm.parents, regexRecordToMatchSet)
+			}
+		}
 	}
 
 	private T getClazzInstance(final RegexRecordToMatch regexRecordToMatch) {
